@@ -22,6 +22,7 @@ package org.sonar.plugins.github;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
+
 import org.sonar.api.BatchComponent;
 import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.InstantiationStrategy;
@@ -30,72 +31,82 @@ import org.sonar.api.config.Settings;
 @InstantiationStrategy(InstantiationStrategy.PER_BATCH)
 public class GitHubPluginConfiguration implements BatchComponent {
 
-  public static final int MAX_GLOBAL_ISSUES  = 10;
+    public static final int MAX_GLOBAL_ISSUES = 10;
 
-  private Settings settings;
-  private Pattern gitSshPattern;
-  private Pattern gitHttpPattern;
+    private Settings settings;
+    private Pattern gitSshPattern;
+    private Pattern gitHttpPattern;
 
-  public GitHubPluginConfiguration(Settings settings) {
-    this.settings = settings;
-    this.gitSshPattern = Pattern.compile(".*@github\\.com:(.*/.*)\\.git");
-    this.gitHttpPattern = Pattern.compile("https?://github\\.com/(.*/.*)\\.git");
-  }
-
-  public int pullRequestNumber() {
-    return settings.getInt(GitHubPlugin.GITHUB_PULL_REQUEST);
-  }
-
-  @CheckForNull
-  public String repository() {
-    String repo = null;
-    if (settings.hasKey(GitHubPlugin.GITHUB_REPO)) {
-      String urlOrRepo = settings.getString(GitHubPlugin.GITHUB_REPO);
-      repo = parseGitUrl(urlOrRepo);
-      if (repo == null) {
-        repo = urlOrRepo;
-      }
+    public GitHubPluginConfiguration(Settings settings) {
+        this.settings = settings;
+        this.gitSshPattern = Pattern.compile(".*@github\\.com:(.*/.*)\\.git");
+        this.gitHttpPattern = Pattern.compile("https?://github\\.com/(.*/.*)\\.git");
     }
-    if (repo == null && settings.hasKey(CoreProperties.LINKS_SOURCES_DEV)) {
-      String url = settings.getString(CoreProperties.LINKS_SOURCES_DEV);
-      repo = parseGitUrl(url);
+
+    public int pullRequestNumber() {
+        return settings.getInt(GitHubPlugin.GITHUB_PULL_REQUEST);
     }
-    if (repo == null && settings.hasKey(CoreProperties.LINKS_SOURCES)) {
-      String url = settings.getString(CoreProperties.LINKS_SOURCES);
-      repo = parseGitUrl(url);
+
+    @CheckForNull
+    public String repository() {
+        String repo = null;
+        if (settings.hasKey(GitHubPlugin.GITHUB_REPO)) {
+            String urlOrRepo = settings.getString(GitHubPlugin.GITHUB_REPO);
+            repo = parseGitUrl(urlOrRepo);
+            if (repo == null) {
+                repo = urlOrRepo;
+            }
+        }
+        if (repo == null && settings.hasKey(CoreProperties.LINKS_SOURCES_DEV)) {
+            String url = settings.getString(CoreProperties.LINKS_SOURCES_DEV);
+            repo = parseGitUrl(url);
+        }
+        if (repo == null && settings.hasKey(CoreProperties.LINKS_SOURCES)) {
+            String url = settings.getString(CoreProperties.LINKS_SOURCES);
+            repo = parseGitUrl(url);
+        }
+        return repo;
     }
-    return repo;
-  }
 
-  @CheckForNull
-  private String parseGitUrl(String urlOrRepo) {
-    Matcher matcher = gitSshPattern.matcher(urlOrRepo);
-    if (matcher.matches()) {
-      return matcher.group(1);
+    @CheckForNull
+    private String parseGitUrl(String urlOrRepo) {
+        Matcher matcher = gitSshPattern.matcher(urlOrRepo);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        matcher = gitHttpPattern.matcher(urlOrRepo);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
     }
-    matcher = gitHttpPattern.matcher(urlOrRepo);
-    if (matcher.matches()) {
-      return matcher.group(1);
+
+    @CheckForNull
+    public String oauth() {
+        return settings.getString(GitHubPlugin.GITHUB_OAUTH);
     }
-    return null;
-  }
 
-  @CheckForNull
-  public String oauth() {
-    return settings.getString(GitHubPlugin.GITHUB_OAUTH);
-  }
+    @CheckForNull
+    public String login() {
+        return settings.getString(GitHubPlugin.GITHUB_LOGIN);
+    }
+    
+    @CheckForNull
+    public String statusOAuth() {
+        return settings.getString(GitHubPlugin.GITHUB_STAUTS_OAUTH);
+    }
+    
+    @CheckForNull
+    public String statusLogin() {
+        return settings.getString(GitHubPlugin.GITHUB_STATUS_LOGIN);
+    }
 
-  @CheckForNull
-  public String login() {
-    return settings.getString(GitHubPlugin.GITHUB_LOGIN);
-  }
+    public boolean isEnabled() {
+        return settings.hasKey(GitHubPlugin.GITHUB_PULL_REQUEST);
+    }
 
-  public boolean isEnabled() {
-    return settings.hasKey(GitHubPlugin.GITHUB_PULL_REQUEST);
-  }
-
-  public String endpoint() {
-    return settings.getString(GitHubPlugin.GITHUB_ENDPOINT);
-  }
+    public String endpoint() {
+        return settings.getString(GitHubPlugin.GITHUB_ENDPOINT);
+    }
 
 }

@@ -21,6 +21,7 @@ package org.sonar.plugins.github;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.sonar.api.CoreProperties;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
@@ -28,55 +29,68 @@ import org.sonar.api.PropertyType;
 import org.sonar.api.SonarPlugin;
 
 @Properties({
-  @Property(
-    key = GitHubPlugin.GITHUB_ENDPOINT,
-    name = "GitHub API Endpoint",
-    description = "URL to access GitHub WS API. Deafult value is fine for public GitHub. Can be modified for GitHub enterprise.",
-    defaultValue = "https://api.github.com",
-    global = true),
-  @Property(
-    key = GitHubPlugin.GITHUB_LOGIN,
-    name = "GitHub Login",
-    description = "GitHub account used to perform operations like adding comments on pull requests.",
-    global = false),
-  @Property(
-    key = GitHubPlugin.GITHUB_OAUTH,
-    name = "GitHub OAuth token",
-    description = "Authentication token",
-    type = PropertyType.PASSWORD,
-    global = false),
-  @Property(
-    key = GitHubPlugin.GITHUB_REPO,
-    name = "GitHub repository",
-    description = "GitHub repository for this project. Will be guessed from '" + CoreProperties.LINKS_SOURCES_DEV + "' if present",
-    global = false,
-    project = false),
-  @Property(
-    key = GitHubPlugin.GITHUB_PULL_REQUEST,
-    name = "GitHub Pull Request",
-    description = "Pull request number",
-    type = PropertyType.INTEGER,
-    global = false,
-    project = false,
-    module = false)
+        @Property(
+                key = GitHubPlugin.GITHUB_ENDPOINT,
+                name = "GitHub API Endpoint",
+                description = "URL to access GitHub WS API. Deafult value is fine for public GitHub. Can be modified for GitHub enterprise.",
+                defaultValue = "https://api.github.com",
+                global = true),
+        @Property(
+                key = GitHubPlugin.GITHUB_LOGIN,
+                name = "GitHub Login",
+                description = "GitHub account used to perform operations like adding comments on pull requests.",
+                global = false),
+        @Property(
+                key = GitHubPlugin.GITHUB_OAUTH,
+                name = "GitHub OAuth token",
+                description = "Authentication token",
+                type = PropertyType.PASSWORD,
+                global = false),
+        @Property(
+                key = GitHubPlugin.GITHUB_STATUS_LOGIN,
+                name = "GitHub Commit Status Login",
+                description = "GitHub account used to perform operations like adding comments on pull requests.",
+                global = false),
+        @Property(
+                key = GitHubPlugin.GITHUB_STAUTS_OAUTH,
+                name = "GitHub OAuth Commit Status token",
+                description = "Authentication token",
+                type = PropertyType.PASSWORD,
+                global = false),
+        @Property(
+                key = GitHubPlugin.GITHUB_REPO,
+                name = "GitHub repository",
+                description = "GitHub repository for this project. Will be guessed from '" + CoreProperties.LINKS_SOURCES_DEV + "' if present",
+                global = false,
+                project = false),
+        @Property(
+                key = GitHubPlugin.GITHUB_PULL_REQUEST,
+                name = "GitHub Pull Request",
+                description = "Pull request number",
+                type = PropertyType.INTEGER,
+                global = false,
+                project = false,
+                module = false)
 })
 public class GitHubPlugin extends SonarPlugin {
 
-  public static final String GITHUB_ENDPOINT = "sonar.github.endpoint";
-  public static final String GITHUB_LOGIN = "sonar.github.login";
-  public static final String GITHUB_OAUTH = "sonar.github.oauth";
-  public static final String GITHUB_REPO = "sonar.github.repository";
-  public static final String GITHUB_PULL_REQUEST = "sonar.github.pullRequest";
+    public static final String GITHUB_ENDPOINT = "sonar.github.endpoint";
+    public static final String GITHUB_LOGIN = "sonar.github.login";
+    public static final String GITHUB_OAUTH = "sonar.github.oauth";
+    public static final String GITHUB_STATUS_LOGIN = "sonar.github.status.login";
+    public static final String GITHUB_STAUTS_OAUTH = "sonar.github.status.oauth";
+    public static final String GITHUB_REPO = "sonar.github.repository";
+    public static final String GITHUB_PULL_REQUEST = "sonar.github.pullRequest";
 
-  @Override
-  public List getExtensions() {
-    return Arrays.asList(
-      PullRequestIssuePostJob.class,
-      GitHubPluginConfiguration.class,
-      PullRequestProjectBuilder.class,
-      PullRequestFacade.class,
-      InputFileCacheSensor.class,
-      InputFileCache.class);
-  }
+    @Override
+    public List getExtensions() {
+        return Arrays.asList(
+                PullRequestIssuePostJob.class,
+                GitHubPluginConfiguration.class,
+                PullRequestProjectBuilder.class,
+                PullRequestFacade.class,
+                InputFileCacheSensor.class,
+                InputFileCache.class);
+    }
 
 }
